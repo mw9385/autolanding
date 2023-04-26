@@ -93,6 +93,16 @@ class ENV(object):
         t4 = +1.0 - 2.0 * (y * y + z * z)
         Z = math.degrees(math.atan2(t3, t4))
         return X, Y, Z
+    
+    def PubPredState(self, states):
+        data_to_send = Float64MultiArray()
+        data_to_send.data = states.detach().cpu().numpy()
+        self.state_pred_pub.publish(data_to_send)
+    
+    def PubTrueState(self, states):
+        data_to_send = Float64MultiArray()
+        data_to_send.data = states.detach().cpu().numpy()
+        self.state_true_pub.publish(data_to_send)
 
 def main():
     env = ENV()
