@@ -20,7 +20,7 @@ parser.add_argument('--lr', default=1e-4, type=float)
 parser.add_argument('--max_step', default=1000000, type=int)
 parser.add_argument('--capacity', default=7, type=int)
 parser.add_argument('--batch_size', default=1, type=int)
-parser.add_argument('--eval_period', default=2100, type=int)
+parser.add_argument('--eval_period', default=1, type=int)
 parser.add_argument('--model_directory', default='./model/lstm/', type=str)
 args = parser.parse_args()
 
@@ -89,7 +89,7 @@ def main():
             position_matrix.append(torch.sqrt(p_error.mean()))
             velocity_matrix.append(torch.sqrt(v_error.mean()))            
             euler_matrix.append(torch.sqrt(e_error.mean()))
-            global_step +=1        
+            global_step +=1  
             
             # write down on tensorboard            
             if global_step % args.eval_period == 0:
@@ -105,6 +105,23 @@ def main():
                 position_matrix = []
                 velocity_matrix = []
                 euler_matrix = []
+
+                # publish
+                env.PubPredState(pred_Y[0])
+                env.PubTrueState(test_Y[0])
+                
+                ######sh#######
+                long_time=env.long_header.stamp.to_sec()+1e-9*env.long_header.stamp.to_nsec()
+                wide_time=env.wide_header.stamp.to_sec()+1e-9*env.wide_header.stamp.to_nsec()
+                print({"long_time":long_time})
+                print({"wide_time":wide_time})
+                
+                if long_time > wide_time:
+                    time=env.long_header
+                else:
+                    time=env.wide_header
+                
+                env.state_time_pub.publish(time)
 
         rate.sleep()
 if __name__ == '__main__':

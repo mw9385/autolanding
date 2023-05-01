@@ -10,9 +10,9 @@ from torch.utils.tensorboard import SummaryWriter
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default='train', type=str) # mode='train' or 'test'
-parser.add_argument('--train_mode', default='lstm', type=str)
+parser.add_argument('--train_mode', default='linear', type=str)
 parser.add_argument('--state_dim', default=24, type=int)
-parser.add_argument('--time_step', default=6, type=int)
+parser.add_argument('--time_step', default=10, type=int)
 parser.add_argument('--n_output', default=9, type=int)
 parser.add_argument('--n_hidden', default=256, type=int)
 parser.add_argument('--n_lstm', default=64, type=int)
@@ -21,8 +21,8 @@ parser.add_argument('--max_step', default=1000000, type=int)
 parser.add_argument('--capacity', default=10000, type=int)
 parser.add_argument('--batch_size', default=512, type=int)
 parser.add_argument('--eval_period', default=1000, type=int)
-parser.add_argument('--model_directory', default='./model/lstm/', type=str)
-parser.add_argument('--log_directory', default='./logs/lstm', type=str)
+parser.add_argument('--model_directory', default='./model/linear/', type=str)
+parser.add_argument('--log_directory', default='./logs/linear', type=str)
 args = parser.parse_args()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
