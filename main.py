@@ -9,7 +9,7 @@ from env import ENV
 from torch.utils.tensorboard import SummaryWriter
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--mode', default='train', type=str) # mode='train' or 'test'
+parser.add_argument('--mode', default='train', type=str, help='train or test') 
 parser.add_argument('--train_mode', default='linear', type=str)
 parser.add_argument('--state_dim', default=24, type=int)
 parser.add_argument('--time_step', default=10, type=int)

@@ -39,7 +39,7 @@ print("Model has been loaded.")
 # get replay buffer
 replay_buffer = Replay_buffer(args)
 
-def main():    
+def test():    
     env = ENV()
     rospy.sleep(2.)
     rate = rospy.Rate(15)   
@@ -77,8 +77,8 @@ def main():
                 pred_Y, pred_hidden = model(test_X)
                 pred_Y = pred_Y[:, -1, :]            
             position_error = pred_Y[:, :3] - test_Y[:, :3]
-            position_error[:, 0] = position_error[:, 0] * -10.0
-            position_error[:, 2] = position_error[:, 2] * -75.0
+            position_error[:, 0] = position_error[:, 0] * (20.0)
+            position_error[:, 2] = position_error[:, 2] * (-25.0)
             p_error = torch.pow(position_error[:, 0], 2) + torch.pow(position_error[:, 1], 2)
             velocity_error = pred_Y[:, 3:6] - test_Y[:, 3:6]
             v_error = torch.pow(velocity_error[:, 0], 2) + torch.pow(velocity_error[:, 1], 2)
@@ -128,54 +128,11 @@ def main():
                 env.state_time_pub.publish(time)
 
         rate.sleep()
-if __name__ == '__main__':
-    main()
-#=======================================================#    
-#                       오차 계산                         #
-#=======================================================#
-# - linear model
-# - testing env: sinusoidal하게 움직이는 상황 (140 * 15= 2100, 한 주기 동안 평가함)
-# - error: 
-#       - Position Error:0.20948487520217896
-#       - Velocity Error:0.16029773652553558 
-#       - Euler Error:0.3437506854534149
 
-# ------------------------------------------------------#
-# - lstm model
-# - testing env: sinusoidal하게 움직이는 상황 (140 * 15= 2100, 한 주기 동안 평가함)
-# - error: 
-#       - Position Error:0.16542430222034454
-#       - Velocity Error:0.07910799235105515
-#       - Euler Error:0.11627911031246185
+# run python test
+test()
 
-# 정지 고도 상황 / landing pad는 움직이고 있음
-# - 3m
-#       - linear:
-#           - Position Error:1.3765994310379028
-#           - Velocity Error:0.6093629002571106 
-#           - Euler Error:1.0849817991256714
-#       -   lstm:
-#           - Position Error:0.4114551246166229
-#           - Velocity Error:0.17357929050922394
-#           - Euler Error:2.11881685256958
-# - 20m
-#       - linear:
-#               - Position Error:0.11212673038244247
-#               - Velocity Error:0.08339332044124603 
-#               - Euler Error:0.1438852995634079
-#       -   lstm:
-#               - Position Error:0.23287321627140045 
-#               - Velocity Error:0.20646965503692627
-#               - Euler Error:0.36421042680740356
-# - 75m
-#       - linear: 
-#           - Position Error:0.22082877159118652
-#           - Velocity Error:0.08135247230529785
-#           - Euler Error:1.504388451576233
-#       -   lstm:
-#           - Position Error:1.8251227140426636
-#           - Velocity Error:0.08852539211511612
-#           - Euler Error:0.07126738131046295
+
 
 
 

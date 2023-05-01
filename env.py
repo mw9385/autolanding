@@ -113,9 +113,7 @@ class ENV(object):
         t3 = +2.0 * (w * z + x * y)
         t4 = +1.0 - 2.0 * (y * y + z * z)
         Z = math.degrees(math.atan2(t3, t4))
-        return X, Y, Z
-    
-<<<<<<< HEAD
+        return X, Y, Z    
     def PubPredState(self, states):   
         data_to_send = Float64MultiArray()
         data_to_send.data = states.detach().cpu().numpy()
@@ -125,30 +123,19 @@ class ENV(object):
         data_to_send = Float64MultiArray()
         data_to_send.data = states.detach().cpu().numpy()
         self.state_true_pub.publish(data_to_send)        
-=======
-    def PubPredState(self, states):
-        data_to_send = Float64MultiArray()
-        data_to_send.data = states.detach().cpu().numpy()
-        self.state_pred_pub.publish(data_to_send)
-    
-    def PubTrueState(self, states):
-        data_to_send = Float64MultiArray()
-        data_to_send.data = states.detach().cpu().numpy()
-        self.state_true_pub.publish(data_to_send)
->>>>>>> origin/main
 
-def main():
-    env = ENV()
-    rospy.sleep(2.)
-    rate = rospy.Rate(10)
-    while True:
-        pose_states = env.get_states()
-        print('pose_states size:{}'.format(np.shape(pose_states)))
-        print('pose_states size:{}'.format((pose_states)))
-        true_states = env.get_true_states()
-        print('true_states size:{}'.format(np.shape(true_states)))
-        print('true_states size:{}'.format((true_states)))
-        rate.sleep()
+# def main():
+#     env = ENV()
+#     rospy.sleep(2.)
+#     rate = rospy.Rate(10)
+#     while True:
+#         pose_states = env.get_states()
+#         print('pose_states size:{}'.format(np.shape(pose_states)))
+#         print('pose_states size:{}'.format((pose_states)))
+#         true_states = env.get_true_states()
+#         print('true_states size:{}'.format(np.shape(true_states)))
+#         print('true_states size:{}'.format((true_states)))
+#         rate.sleep()
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
