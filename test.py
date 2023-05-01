@@ -102,9 +102,13 @@ def main():
                                                              
                 print("Prediction:{}".format(pred_Y[0]))
                 print("True:{}".format(test_Y[0]))
+                
                 position_matrix = []
                 velocity_matrix = []
                 euler_matrix = []
+                
+                # publish
+                env.PubState(pred_Y[0])
 
                 # publish
                 env.PubPredState(pred_Y[0])
