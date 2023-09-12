@@ -20,8 +20,8 @@ class ENV(object):
         rospy.wait_for_message('/marker_gt', Odometry)
         
         ######sh#####
-        rospy.wait_for_message('/cam_long_array_time', Header)
-        rospy.wait_for_message('/cam_wide_array_time', Header)
+        # rospy.wait_for_message('/cam_long_array_time', Header)
+        # rospy.wait_for_message('/cam_wide_array_time', Header)
         ###########
         
         # define subscriber

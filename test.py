@@ -12,15 +12,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default='train', type=str) # mode='train' or 'test'
 parser.add_argument('--train_mode', default='lstm', type=str)
 parser.add_argument('--state_dim', default=24, type=int)
-parser.add_argument('--time_step', default=6, type=int)
+parser.add_argument('--time_step', default=10, type=int)
 parser.add_argument('--n_output', default=9, type=int)
-parser.add_argument('--n_hidden', default=256, type=int)
+parser.add_argument('--n_hidden', default=128, type=int)
 parser.add_argument('--n_lstm', default=64, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
 parser.add_argument('--max_step', default=1000000, type=int)
-parser.add_argument('--capacity', default=7, type=int)
+parser.add_argument('--capacity', default=11, type=int)
 parser.add_argument('--batch_size', default=1, type=int)
-parser.add_argument('--eval_period', default=1, type=int)
+parser.add_argument('--eval_period', default=1000, type=int)
 parser.add_argument('--model_directory', default='./model/lstm/', type=str)
 args = parser.parse_args()
 
@@ -50,16 +50,16 @@ def test():
     # Generate dataset in gazebo environment. Wait until a buffer is filled.
     global_step = 0
     for step in range(args.max_step): 
-        if step < args.capacity: print("steps:{}".format(step))
-        states = env.get_states()  
-        true_states = env.get_true_states()      
-        replay_buffer.push((states, true_states))        
-        
+        if step < args.capacity: 
+            print("steps:{}".format(step))
+            states = env.get_states()  
+            true_states = env.get_true_states()      
+            replay_buffer.push((states, true_states))        
         if step == args.capacity:
             print('------------------------')
             print('START Testing')
         if args.capacity < step:    
-            print("Current Steps:{}".format(step))                            
+            # print("Current Steps:{}".format(step))                            
             # get samples from the buffer
             test_X, test_Y = replay_buffer.sample(args.batch_size)
             # load model to cuda and flatten for the use of network input
@@ -78,6 +78,7 @@ def test():
                 pred_Y = pred_Y[:, -1, :]            
             position_error = pred_Y[:, :3] - test_Y[:, :3]
             position_error[:, 0] = position_error[:, 0] * (20.0)
+            position_error[:, 1] = position_error[:, 1] * (20.0)
             position_error[:, 2] = position_error[:, 2] * (-25.0)
             p_error = torch.pow(position_error[:, 0], 2) + torch.pow(position_error[:, 1], 2)
             velocity_error = pred_Y[:, 3:6] - test_Y[:, 3:6]
@@ -97,18 +98,17 @@ def test():
                 velocity_matrix = torch.stack(velocity_matrix, dim=0)
                 euler_matrix = torch.stack(euler_matrix, dim=0)
                 
-                print('global_step:{}'.format(global_step))        
-                print("Position Error:{}, Velocity Error:{}, Euler Error:{}".format(torch.mean(position_matrix), torch.mean(velocity_matrix), torch.mean(euler_matrix)))
+                # print('global_step:{}'.format(global_step))        
+                print("Position Error:{}, Velocity Error:{}, Euler Error:{}".format(torch.mean(position_matrix), 
+                                                                                    torch.mean(velocity_matrix), 
+                                                                                    torch.mean(euler_matrix)))
                                                              
-                print("Prediction:{}".format(pred_Y[0]))
-                print("True:{}".format(test_Y[0]))
+                # print("Prediction:{}".format(pred_Y[0]))
+                # print("True:{}".format(test_Y[0]))
                 
                 position_matrix = []
                 velocity_matrix = []
                 euler_matrix = []
-                
-                # publish
-                env.PubState(pred_Y[0])
 
                 # publish
                 env.PubPredState(pred_Y[0])
@@ -116,9 +116,7 @@ def test():
                 
                 ######sh#######
                 long_time=env.long_header.stamp.to_sec()+1e-9*env.long_header.stamp.to_nsec()
-                wide_time=env.wide_header.stamp.to_sec()+1e-9*env.wide_header.stamp.to_nsec()
-                print({"long_time":long_time})
-                print({"wide_time":wide_time})
+                wide_time=env.wide_header.stamp.to_sec()+1e-9*env.wide_header.stamp.to_nsec()                
                 
                 if long_time > wide_time:
                     time=env.long_header
@@ -133,8 +131,17 @@ def test():
 test()
 
 
+# 고도 20m/ 마커 위치 정중앙/ 정지 상태
+# Linear Model: Position Error:0.38(m), Velocity Error:0.21(m/s), Euler Error:1.86(deg)
+# LSTM Model: Position Error:0.66(m), Velocity Error:0.12(m/s), Euler Error:1.17(deg)
 
+# 고도 10m/ 마커 위치 정중앙/ 정지 상태 
+# Linear Model: Position Error:0.08(m), Velocity Error:0.04(m/s), Euler Error:0.70(deg)
+# LSTM Model: Position Error:0.96(m), Velocity Error:0.30(m/s), Euler Error:0.56(deg)
 
+# 마커 움직이는 상태/ 고도 15m ~25m
+# Linear Model: Position Error:0.30(m), Velocity Error:0.12(m/s), Euler Error:0.40(deg)
+# LSTM Model: Position Error:0.44(m), Velocity Error:0.08(m/s), Euler Error:0.41(deg)
 
 
 
